@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AI工具集大全</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .count {
+      text-align: center;
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .link-container {
+      display: grid;
+      gap: 10px;
+    }
+    .link-item a {
+      display: block;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      color: #1a73e8;
+      text-decoration: none;
+      word-break: break-all;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: background 0.2s;
+    }
+    .link-item a:hover {
+      background-color: #f0f8ff;
+      text-decoration: underline;
+    }
+    .tip {
+      margin-top: 30px;
+      padding: 15px;
+      background: #e8f0fe;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 14px;
+      color: #5f6368;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 AI 工具集大全</h1>
+  <div class="count">共 <strong>68</strong> 个网站</div>
+  <div id="linkContainer" class="link-container"></div>
+
+  <div class="tip">
+    💡 <strong>使用技巧：</strong>按住 <strong>Ctrl</strong>（Windows/Linux）或 <strong>Cmd</strong>（Mac）并点击链接，可在后台同时打开多个网站！
+  </div>
+
+  <script>
+    // 原始域名列表（无协议头）
+    const domains = [
+      'www.iuu.ai',
+      'www.airadar.live',
+      'www.aiphotoonline.com',
+      'www.aivideomeme.com',
+      'www.3daimaker.com',
+      'www.aiphototemplate.com',
+      'www.replicate.com',
+      'www.themotte.org',
+      'www.filament2print.com',
+      'www.fastbot.org',
+      'www.aivideomemegenerator.com',
+      'www.aivideoonline.com',
+      'www.conove.com',
+      'www.hunyuan-3d.com',
+      'www.narwhal.city',
+      'www.nav-ai.net',
+      'www.pixeldojo.ai',
+      'www.saastrac.com',
+      'www.thefutureofworkinstitute.xyz',
+      'www.unikat-ilmenau.de',
+      'www.vgtimes.com',
+      'www.wanxaivideo.com',
+      'www.bug.hr',
+      'www.forpes.ru',
+      'www.navai.me',
+      'www.raindrop.io',
+      'www.substack.com',
+      'www.woy.ai',
+      'www.8coint.com',
+      'www.adul.notion.site',
+      'www.aiphotoassistant.com',
+      'www.auganix.org',
+      'www.edgeimpulse.com',
+      'www.gputomine.com',
+      'www.janisheck.com',
+      'www.open-ia.org',
+      'www.tacticlinks.com',
+      'www.toplikevideo.com',
+      'www.vidau.ai',
+      'www.vynixal.com',
+      'www.webdomino.net',
+      'www.yager-research.ca',
+      'www.addpotion.com',
+      'www.agdsoft.com',
+      'www.aifake.pro',
+      'www.ailynx.ru',
+      'www.aloa.co',
+      'www.aloa.dev',
+      'www.alwaqie-ar.net',
+      'www.anchorurl.cloud',
+      'www.appa-lytics.com',
+      'www.awesome3dgen.com',
+      'www.bakoillutrateblog.com',
+      'www.braintools.ru',
+      'www.chiaseng96.azurewebsites.net',
+      'www.chip.com.tr',
+      'www.cloudernative.com',
+      'www.comparisontabl.es',
+      'www.dailybite.ai',
+      'www.descargo-gratis.com',
+      'www.designrush.com',
+      'www.dev.to',
+      'www.diasporalens.com',
+      'www.directorydaddy.com',
+      'www.domaindexer.com',
+      'www.drh.nz',
+      'www.dtautosphere.com',
+      'www.example3.com',
+      'www.factsheets.com',
+      'www.fooshya.com',
+      'www.framepack-ai.com',
+      'www.futurae.fr',
+      'www.future-mag.co.uk',
+      'www.gamerwld.com',
+      'www.genainews.tech',
+      'www.guia-inventor-miguel.webflow.io',
+      'www.hartmann-capital.webflow.io',
+      'www.hartmanncapital.com',
+      'www.hunyuan-3d.net',
+      'www.infosec.pub',
+      'www.inventormiguel.com',
+      'www.itnetwork.rs',
+      'www.jadecong.github.io',
+      'www.jake.eu',
+      'www.kait.dev',
+      'www.knows.monster',
+      'www.leftypol.org',
+      'www.list.show',
+      'www.metropulsenews.com',
+      'www.midlibrary.io',
+      'www.mike.gold',
+      'www.moguravr.com',
+      'www.morikatron.ai',
+      'www.myarchitectai.com',
+      'www.nice-letterform.com',
+      'www.nukleusmedia.hu',
+      'www.nvidia.co.jp',
+      'www.nvidia.co.kr',
+      'www.nvidia.com',
+      'www.nvidia.com.tw',
+      'www.on2u-e.com',
+      'www.ourcoders.com',
+      'www.palanq.win',
+      'www.parolaanalytics.com',
+      'www.prefersystems.com',
+      'www.preicfes-gratis.com',
+      'www.pro-blockchain.com',
+      'www.pvsm.ru',
+      'www.radii.co',
+      'www.rehla.academy',
+      'www.roaduniverse.com',
+      'www.salarydistribution.com',
+      'www.santiago.bz',
+      'www.savepearlharbor.com'
+    ];
+
+    const container = document.getElementById('linkContainer');
+    domains.forEach(domain => {
+      const div = document.createElement('div');
+      div.className = 'link-item';
+      
+      const link = document.createElement('a');
+      link.href = 'https://' + domain; // ✅ 安全添加 https://
+      link.target = '_blank';
+      link.textContent = domain;
+      
+      div.appendChild(link);
+      container.appendChild(div);
+    });
+  </script>
+</body>
+</html>
