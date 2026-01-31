@@ -64,11 +64,112 @@
       font-size: 14px;
       color: #5f6368;
     }
+    /* 提交按钮 - 右上角固定 */
+    .submit-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 100;
+    }
+    .submit-btn:hover {
+      background: #1557b0;
+    }
+    /* 模态框遮罩 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    /* 模态框内容 */
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      width: 500px;
+      max-width: 90%;
+    }
+    .modal-title {
+      margin: 0 0 16px 0;
+      font-size: 18px;
+      color: #2c3e50;
+    }
+    .modal-textarea {
+      width: 100%;
+      height: 200px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .modal-buttons {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .modal-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .modal-btn-primary {
+      background: #1a73e8;
+      color: white;
+    }
+    .modal-btn-primary:hover {
+      background: #1557b0;
+    }
+    .modal-btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    .modal-btn-secondary:hover {
+      background: #d0d0d0;
+    }
   </style>
 </head>
 <body>
+  <button class="submit-btn" onclick="openModal()">提交</button>
+
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3 class="modal-title">粘贴链接列表</h3>
+      <textarea id="urlInput" class="modal-textarea" placeholder="请粘贴 URL 列表，每行一个...
+例如：
+https://www.example1.com
+https://www.example2.com
+http://site3.com"></textarea>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-secondary" onclick="clearAll()">清空</button>
+        <button class="modal-btn modal-btn-secondary" onclick="closeModal()">取消</button>
+        <button class="modal-btn modal-btn-primary" onclick="applyFilter()">确认</button>
+      </div>
+    </div>
+  </div>
+
   <h1>🚀 AI 工具集大全</h1>
-  <div class="count">共 <strong>68</strong> 个网站</div>
+  <div class="count">共 <strong id="countNum">68</strong> 个网站</div>
   <div id="linkContainer" class="link-container"></div>
 
   <div class="tip">
@@ -194,24 +295,98 @@
       'www.savepearlharbor.com'
     ];
 
+    // 全局变量存储当前显示的域名列表
+    let currentDomains = [...domains];
     const container = document.getElementById('linkContainer');
-    domains.forEach(domain => {
-      const div = document.createElement('div');
-      div.className = 'link-item';
+    const countNum = document.getElementById('countNum');
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.title = '选中标记';
+    // 渲染链接列表
+    function renderLinks() {
+      container.innerHTML = '';
+      currentDomains.forEach(domain => {
+        const div = document.createElement('div');
+        div.className = 'link-item';
 
-      const link = document.createElement('a');
-      link.href = 'https://' + domain;
-      link.target = '_blank';
-      link.textContent = domain;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.title = '选中标记';
 
-      div.appendChild(checkbox);
-      div.appendChild(link);
-      container.appendChild(div);
-    });
+        const link = document.createElement('a');
+        link.href = 'https://' + domain;
+        link.target = '_blank';
+        link.textContent = domain;
+
+        div.appendChild(checkbox);
+        div.appendChild(link);
+        container.appendChild(div);
+      });
+      // 更新计数
+      countNum.textContent = currentDomains.length;
+    }
+
+    // 打开模态框
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    // 关闭模态框
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    // 点击遮罩层关闭
+    function closeModalOnOverlay(event) {
+      if (event.target === event.currentTarget) {
+        closeModal();
+      }
+    }
+
+    // 解析 URL 列表
+    function parseUrls(text) {
+      const lines = text.split('\n');
+      const urls = [];
+      lines.forEach(line => {
+        // 匹配 http/https URL
+        const match = line.match(/https?:\/\/([^\s]+)/);
+        if (match) {
+          // 提取域名，移除 www. 前缀以便匹配
+          let domain = match[1].replace(/^www\./, '');
+          // 移除路径部分，只保留域名
+          domain = domain.split('/')[0];
+          urls.push(domain);
+        }
+      });
+      return [...new Set(urls)]; // 去重
+    }
+
+    // 应用过滤 - 直接显示用户粘贴的链接
+    function applyFilter() {
+      const input = document.getElementById('urlInput').value.trim();
+      if (!input) {
+        alert('请输入链接列表');
+        return;
+      }
+      const targetDomains = parseUrls(input);
+      if (targetDomains.length === 0) {
+        alert('未找到有效的 URL');
+        return;
+      }
+      // 直接使用用户输入的链接，完全替换当前列表
+      currentDomains = targetDomains.map(d => d.replace(/^www\./, ''));
+      renderLinks();
+      closeModal();
+    }
+
+    // 清空列表
+    function clearAll() {
+      currentDomains = [];
+      document.getElementById('urlInput').value = '';
+      renderLinks();
+      closeModal();
+    }
+
+    // 初始化渲染
+    renderLinks();
   </script>
 </body>
 </html>
