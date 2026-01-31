@@ -155,11 +155,11 @@
   <div id="modalOverlay" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <h3 class="modal-title">粘贴链接列表</h3>
-      <textarea id="urlInput" class="modal-textarea" placeholder="请粘贴 URL 列表，每行一个...
-例如：
+      <textarea id="urlInput" class="modal-textarea" placeholder="请粘贴链接列表，每行一个...
+支持格式：
 https://www.example1.com
-https://www.example2.com
-http://site3.com"></textarea>
+www.example2.com
+example3.com"></textarea>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="clearAll()">清空</button>
         <button class="modal-btn modal-btn-secondary" onclick="closeModal()">取消</button>
@@ -341,18 +341,28 @@ http://site3.com"></textarea>
       }
     }
 
-    // 解析 URL 列表
+    // 解析 URL 列表（支持 http/https URL 和纯域名格式）
     function parseUrls(text) {
       const lines = text.split('\n');
       const urls = [];
       lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+
         // 匹配 http/https URL
-        const match = line.match(/https?:\/\/([^\s]+)/);
-        if (match) {
-          // 提取域名，移除 www. 前缀以便匹配
-          let domain = match[1].replace(/^www\./, '');
-          // 移除路径部分，只保留域名
+        const httpMatch = line.match(/https?:\/\/([^\s]+)/);
+        if (httpMatch) {
+          let domain = httpMatch[1].replace(/^www\./, '');
           domain = domain.split('/')[0];
+          urls.push(domain);
+          return;
+        }
+
+        // 匹配纯域名格式（如 10words.io 或 www.example.com）
+        // 域名格式：字母数字- . 组成，至少包含一个点
+        const domainMatch = line.match(/^([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z0-9][-a-zA-Z0-9.]*[a-zA-Z0-9])$/);
+        if (domainMatch) {
+          let domain = domainMatch[1].replace(/^www\./, '');
           urls.push(domain);
         }
       });
